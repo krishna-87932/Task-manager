@@ -100,3 +100,36 @@ class completeTask(APIView):
         task.status = data['status']
         print(task.status)
         return Response(status=status.HTTP_200_OK)
+    
+class UpdateTask(APIView):
+    permission_classes = [IsAuthenticated]
+    def put(self, request, pk):
+        try:
+            task = Tasks.objects.get(pk=pk, user=request.user)
+            data = request.data
+        
+            task.title = data.get('title', task.title)
+            task.desc = data.get('desc', task.desc)
+            task.status = data.get('status', task.status)
+            
+            task.save()
+            
+            return Response({
+                "msg": "Task updated successfully",
+                "task": {
+                    "id": task.id,
+                    "title": task.title,
+                    "desc": task.desc,
+                    "status": task.status,
+                    "username": task.user.username
+                }
+            }, status=status.HTTP_200_OK)
+            
+        except Tasks.DoesNotExist:
+            return Response({
+                "error": "Task not found"
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+    
+
+        

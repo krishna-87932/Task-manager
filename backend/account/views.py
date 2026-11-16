@@ -25,6 +25,7 @@ class UserDetailView(RetrieveAPIView):
     
 
 
+
 class LoginApi(APIView):
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = 'login'
@@ -58,7 +59,7 @@ class LoginApi(APIView):
                 "status": False,
                 "data": {},
                 'msg': "Invalid Credintials."
-            }
+            },status = status.HTTP_404_NOT_FOUND
         )
         
 
