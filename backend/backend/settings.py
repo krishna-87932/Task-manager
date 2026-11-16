@@ -23,9 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=_^e_p_@ye#he3$#iv!@uey^b!i)-k92rtl^i4&@%ksj$2^lu5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+  
+    "localhost",
+    "127.0.0.1",
+    ".onrender.com",
+    
+]
 
 
 # Application definition
@@ -48,6 +54,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -197,3 +204,5 @@ REST_FRAMEWORK = {
 EmailBackend = 'django.core.mail.backends.console.EmailBackend'
 
 
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
