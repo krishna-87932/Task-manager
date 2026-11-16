@@ -21,6 +21,6 @@
 ## Start The frontend
 
  **In /frontend directory run this command**
-    ```bash
+    ```
     npm run dev
     ```
