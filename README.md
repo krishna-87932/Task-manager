@@ -17,3 +17,10 @@
    The server will be available at:
 
    `http://127.0.0.1:8000/`
+
+## Start The frontend
+
+ **In /frontend directory run this command**
+    ```bash
+    npm run dev
+    ```
