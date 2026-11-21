@@ -1,6 +1,7 @@
 
 import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import "./Auth.css";
 
 function Login() {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ function Login() {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/account/login/",
+        "https://task-manager-s47d.onrender.com/account/login/",
         {
           method: "POST",
           headers: {
@@ -54,11 +55,18 @@ function Login() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <main className="auth-page">
+      <section className="auth-card" aria-labelledby="login-title">
+        <div className="auth-heading">
+          <p className="auth-brand">Task Manager</p>
+          <h1 id="login-title">Welcome back</h1>
+          <p>Sign in to manage your tasks.</p>
+        </div>
 
-      <form onSubmit={handleLogin}>
+        <form className="auth-form" onSubmit={handleLogin}>
+        <label htmlFor="login-username">Username</label>
         <input
+          id="login-username"
           type="text"
           name="username"
           placeholder="Username"
@@ -67,7 +75,9 @@ function Login() {
           required
         />
 
+        <label htmlFor="login-password">Password</label>
         <input
+          id="login-password"
           type="password"
           name="password"
           placeholder="Password"
@@ -76,11 +86,16 @@ function Login() {
           required
         />
 
-        <button type="submit">Login</button>
+        {message && <p className="auth-message" role="alert">{message}</p>}
+
+        <button className="auth-submit" type="submit">Login</button>
       </form>
 
-      <p>{message}</p>
-    </div>
+        <p className="auth-footer">
+          New here? <Link to="/register">Create an account</Link>
+        </p>
+      </section>
+    </main>
   );
 }
 

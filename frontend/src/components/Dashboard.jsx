@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import "./Dashboard.css";
 
-const API_URL = "http://127.0.0.1:8000/todo";
+const API_URL = "https://task-manager-s47d.onrender.com/todo";
 
 function Dashboard() {
   const [tasks, setTasks] = useState([]);
