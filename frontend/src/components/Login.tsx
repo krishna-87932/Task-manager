@@ -12,6 +12,7 @@ function Login() {
   });
 
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -22,7 +23,10 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setMessage("Logging in...");
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    setMessage("");
 
     try {
       const response = await fetch(
@@ -38,19 +42,25 @@ function Login() {
 
       const data = await response.json();
 
-      console.log("Login response:", data);
-      console.log("Token:", data.data?.token);
-
       if (response.ok && data.status) {
         localStorage.setItem("token", data.data.token);
-        console.log("Saved token:", localStorage.getItem("token"));
         navigate("/dashboard");
+        return;
       }
 
-      // Redirect to your dashboard here.
+      throw new Error(
+        typeof data.msg === "string"
+          ? data.msg
+          : "Unable to log in. Check your username and password."
+      );
     } catch (error) {
-      setMessage("Unable to connect to the server.");
-      console.error(error);
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to connect to the server."
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -88,7 +98,9 @@ function Login() {
 
         {message && <p className="auth-message" role="alert">{message}</p>}
 
-        <button className="auth-submit" type="submit">Login</button>
+        <button className="auth-submit" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Signing in..." : "Login"}
+        </button>
       </form>
 
         <p className="auth-footer">

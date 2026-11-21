@@ -105,16 +105,31 @@ function Dashboard() {
     e.preventDefault();
 
     const isEditing = editId !== null;
+    const taskId = editId;
+    const previousTask = isEditing
+      ? tasks.find((task) => task.id === taskId)
+      : null;
+    const updatedTask = { ...formData };
 
     const url = isEditing
-      ? `${API_URL}/updatetask/${editId}/`
+      ? `${API_URL}/updatetask/${taskId}/`
       : `${API_URL}/addtask/`;
+
+    if (isEditing) {
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === taskId ? { ...task, ...updatedTask } : task
+        )
+      );
+      setShowForm(false);
+      setEditId(null);
+    }
 
     try {
       const response = await fetch(url, {
         method: isEditing ? "PUT" : "POST",
         headers: getHeaders(),
-        body: JSON.stringify(formData),
+        body: JSON.stringify(updatedTask),
       });
 
       const data = await response.json();
@@ -124,17 +139,15 @@ function Dashboard() {
       }
 
       if (isEditing) {
-        // Update existing task without changing its position
         setTasks((prevTasks) =>
           prevTasks.map((task) =>
-            task.id === editId
-              ? { ...task, ...formData, ...(data.task || {}) }
+            task.id === taskId
+              ? { ...task, ...updatedTask, ...(data.task || {}) }
               : task
           )
         );
       } else {
-        // Fetch tasks after creating a new task
-        await fetchTasks();
+        setTasks((prevTasks) => [...prevTasks, data.data]);
       }
 
       setShowForm(false);
@@ -149,6 +162,13 @@ function Dashboard() {
       setError("");
 
     } catch (err) {
+      if (isEditing && previousTask) {
+        setTasks((prevTasks) =>
+          prevTasks.map((task) => (task.id === taskId ? previousTask : task))
+        );
+        setShowForm(true);
+        setEditId(taskId);
+      }
       setError(err.message);
     }
   };
@@ -161,6 +181,10 @@ function Dashboard() {
 
     if (!confirmed) return;
 
+    const deletedTaskIndex = tasks.findIndex((task) => task.id === id);
+    const deletedTask = tasks[deletedTaskIndex];
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+
     try {
       const response = await fetch(`${API_URL}/delete/${id}/`, {
         method: "DELETE",
@@ -170,9 +194,20 @@ function Dashboard() {
       if (!response.ok) {
         throw new Error("Unable to delete task");
       }
-
-      await fetchTasks();
+      setError("");
     } catch (err) {
+      if (deletedTask) {
+        setTasks((prevTasks) => {
+          if (prevTasks.some((task) => task.id === id)) return prevTasks;
+          const restoredTasks = [...prevTasks];
+          restoredTasks.splice(
+            Math.min(deletedTaskIndex, restoredTasks.length),
+            0,
+            deletedTask
+          );
+          return restoredTasks;
+        });
+      }
       setError(err.message);
     }
   };
