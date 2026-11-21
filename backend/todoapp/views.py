@@ -27,6 +27,7 @@ class AddTask(APIView):
                     "title": task.title,
                     "desc": task.desc,
                     "status": task.status,
+                    "created_at": task.created_at,
                     "user_id": task.user_id,
                     "username": task.user.username,
                     "Token": str(user_token)
