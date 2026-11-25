@@ -226,6 +226,7 @@ function Dashboard() {
 
       <header className="dashboard-header">
         <h2>Todo App</h2>
+        <span>created by: krishna-87932 (github)</span>
 
         <button className="logout-btn" onClick={handleLogout}>
           Logout
