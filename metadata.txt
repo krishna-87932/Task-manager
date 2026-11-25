@@ -1,0 +1,83 @@
+TASK MANAGER - PROJECT AND API METADATA
+
+Project basics
+--------------
+Frontend: React 19 + Vite single-page application
+Frontend URL: https://task-manager-frontend-ycir.onrender.com
+Backend: Django + Django REST Framework
+Backend URL: https://task-manager-s47d.onrender.com
+Database: PostgreSQL
+Authentication: Django REST Framework token authentication
+
+For protected endpoints, send this request header:
+Authorization: Token <token>
+
+API endpoints
+-------------
+
+Health/test
+GET    /testapi/test/
+        Public connectivity test. Returns a short "working" message.
+
+Accounts
+POST   /account/login/
+        Public. JSON body: {"username": "...", "password": "..."}.
+        Returns an authentication token on success. Login is throttled to
+        5 requests per minute.
+
+POST   /account/register/
+        Public. JSON body: {"username": "...", "email": "...",
+        "password": "...", "password_confirm": "..."}.
+        Creates an account and returns a token.
+
+GET    /account/getuser/<id>
+        No explicit authentication requirement is declared. Retrieves a
+        user's id, username, and email.
+
+POST   /account/forgot-password/
+        Public. JSON body: {"email": "..."}.
+        Requests a password-reset email.
+
+POST   /account/reset-password/
+        Public. JSON body: {"uid": "...", "token": "...",
+        "password": "...", "confirm_password": "..."}.
+        Resets the password if the reset token is valid.
+
+Tasks
+POST   /todo/addtask/
+        Token required. JSON body includes title, desc, and status.
+        Creates a task for the authenticated user.
+
+GET    /todo/gettask/<id>/
+        Token required. Retrieves one task by ID.
+
+GET    /todo/alltasks/
+        Token required. Lists tasks belonging to the authenticated user.
+
+DELETE /todo/delete/<id>/
+        Deletes a task by ID. No authentication requirement is declared
+        on this endpoint in the current implementation.
+
+POST   /todo/update-state/<id>/
+        Token required. JSON body: {"status": true|false}.
+        Intended to change a task's completion status.
+
+PUT    /todo/updatetask/<id>/
+        Token required. JSON body may include title, desc, and status.
+        Updates a task owned by the authenticated user.
+
+Other route
+-----------
+/admin/ is Django's browser-based administration site, not an API endpoint.
+
+Current implementation notes
+-----------------------------
+- The single-task GET endpoint requires a token but does not check that the
+  requested task belongs to the authenticated user.
+- The delete endpoint has no explicit authentication or task-ownership check.
+- The update-state endpoint currently returns success without saving the
+  changed status to the database.
+- The reset-password view references urlsafe_base64_decode without importing
+  it, so valid reset submissions currently fail at runtime.
+- Task fields are title (up to 150 characters), desc (up to 700 characters),
+  status (boolean), created_at (date), and user (owner).
